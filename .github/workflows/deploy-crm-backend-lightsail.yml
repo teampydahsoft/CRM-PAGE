@@ -1,0 +1,60 @@
+# Deploy CRM Backend to AWS Lightsail on push to main
+name: Deploy CRM Backend to Lightsail
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'crm-backend/**'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  REMOTE_APP_DIR: '/home/ec2-user/landing/crm-backend'   # landing/crm-backend on Lightsail (ec2-user)
+
+jobs:
+  deploy:
+    name: Deploy to Lightsail
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: crm-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key for deploy
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.LIGHTSAIL_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Sync files to Lightsail
+        run: |
+          rsync -avz --delete \
+            --exclude 'node_modules' \
+            --exclude '.env' \
+            --exclude '.git' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+            ./ ${{ secrets.LIGHTSAIL_USER }}@${{ secrets.LIGHTSAIL_HOST }}:${{ env.REMOTE_APP_DIR }}/
+
+      - name: Install dependencies and restart on Lightsail
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USER }}
+          key: ${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -e
+            cd ${{ env.REMOTE_APP_DIR }}
+            npm ci --omit=dev 2>/dev/null || npm install --omit=dev
+            if command -v pm2 &> /dev/null; then
+              pm2 restart crm-backend 2>/dev/null || pm2 start src/server.js --name crm-backend
+            elif systemctl is-active --quiet crm-backend 2>/dev/null; then
+              sudo systemctl restart crm-backend
+            else
+              echo "Configure pm2 or systemd on the server for auto-restart"
+            fi
