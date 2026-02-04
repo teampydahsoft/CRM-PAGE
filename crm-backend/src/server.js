@@ -31,9 +31,10 @@ if (process.env.CORS_ORIGIN) {
 const productionOrigins = [
   'https://crm.pydah.edu.in',           // Production CRM frontend
   'https://pydahsdms.vercel.app',        // Production student portal
-  'https://pydah-admissions.vercel.app',               // Development portal application
-  'http://localhost:3000',               // Local student portal application
-  'http://localhost:5173'                // Local CRM frontend
+  'https://pydah-admissions.vercel.app', // Development portal application
+  'https://li-hrms.vercel.app',          // HRMS portal (SSO redirect target; may call CRM backend from browser)
+  'http://localhost:3000',               // Local student / HRMS portal application
+  'http://localhost:5173'               // Local CRM frontend
 ];
 
 // Combine and remove duplicates
