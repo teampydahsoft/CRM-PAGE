@@ -1,4 +1,5 @@
 import mysql from 'mysql2/promise';
+import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -6,10 +7,13 @@ dotenv.config();
 /**
  * Database Configuration
  * MySQL connection pool setup for multiple databases
+ * HRMS MongoDB connection (optional, for SSO verify-token user resolution)
  */
 
 let studentPool = null;
 let admissionsPool = null;
+let hrmsMongoClient = null;
+let hrmsMongoDb = null;
 
 /**
  * Create MySQL connection pool for student database
@@ -69,6 +73,32 @@ export const createPool = () => {
 };
 
 /**
+ * Connect to HRMS MongoDB (optional; when HRMS_MONGO_URI or HRMS_MONGO_URL is set)
+ * @returns {Promise<import('mongodb').Db|null>} HRMS db instance or null
+ */
+export const connectHRMSMongo = async () => {
+  const uri = process.env.HRMS_MONGO_URI || process.env.HRMS_MONGO_URL;
+  if (!uri) {
+    return null;
+  }
+  if (hrmsMongoClient) {
+    return hrmsMongoDb;
+  }
+  try {
+    hrmsMongoClient = new MongoClient(uri);
+    await hrmsMongoClient.connect();
+    hrmsMongoDb = hrmsMongoClient.db();
+    console.log('✅ HRMS MongoDB connection established');
+    return hrmsMongoDb;
+  } catch (error) {
+    console.error('❌ HRMS MongoDB connection error:', error.message);
+    hrmsMongoClient = null;
+    hrmsMongoDb = null;
+    return null;
+  }
+};
+
+/**
  * Initialize database connections
  */
 export const connectDatabase = async () => {
@@ -89,7 +119,12 @@ export const connectDatabase = async () => {
       console.log(`✅ Admissions database (${process.env.DB_NAME_ADMISSIONS}) connection established`);
     }
 
-    return { studentPool, admissionsPool };
+    // Connect to HRMS MongoDB if configured
+    if (process.env.HRMS_MONGO_URI || process.env.HRMS_MONGO_URL) {
+      await connectHRMSMongo();
+    }
+
+    return { studentPool, admissionsPool, hrmsMongoDb };
   } catch (error) {
     console.error('❌ Database connection error:', error);
     throw error;
@@ -110,6 +145,12 @@ export const closeDatabase = async () => {
       await admissionsPool.end();
       admissionsPool = null;
       console.log('✅ Admissions database connection pool closed');
+    }
+    if (hrmsMongoClient) {
+      await hrmsMongoClient.close();
+      hrmsMongoClient = null;
+      hrmsMongoDb = null;
+      console.log('✅ HRMS MongoDB connection closed');
     }
   } catch (error) {
     console.error('❌ Error closing database connection:', error);
@@ -144,12 +185,25 @@ export const getPool = () => {
   return getStudentPool();
 };
 
+/**
+ * Get HRMS MongoDB db instance (lazy connect if URI is set)
+ * @returns {Promise<import('mongodb').Db|null>} HRMS db or null if not configured
+ */
+export const getHRMSDb = async () => {
+  if (hrmsMongoDb) {
+    return hrmsMongoDb;
+  }
+  return connectHRMSMongo();
+};
+
 export default {
   createPool,
   createStudentPool,
   createAdmissionsPool,
   connectDatabase,
   closeDatabase,
+  connectHRMSMongo,
+  getHRMSDb,
   getPool,
   getStudentPool,
   getAdmissionsPool,

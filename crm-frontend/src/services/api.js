@@ -3,7 +3,7 @@
  * Handles all backend API communication
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 /**
  * Generic API request handler
@@ -49,12 +49,16 @@ export const authAPI = {
    * @param {string} username
    * @param {string} password
    * @param {string} role - Optional role hint ('student', 'staff', etc.)
+   * @param {string} portalId - When 'hrms', backend validates against HRMS MongoDB only
    * @returns {Promise<Object>} User data and tokens
    */
-  login: async (username, password, role = null) => {
+  login: async (username, password, role = null, portalId = null) => {
+    const body = { username, password };
+    if (role) body.role = role;
+    if (portalId) body.portalId = portalId;
     return apiRequest('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ username, password, role }),
+      body: JSON.stringify(body),
     });
   },
 
@@ -133,6 +137,8 @@ export const PORTAL_IDS = {
   'https://pydahsdms.vercel.app': 'student-portal',
   'https://hms.pydahsoft.in': 'hostel-automation',
   'https://hrms.pydahsoft.in': 'hrms',
+  'https://li-hrms.vercel.app': 'hrms', // HRMS portal
+  'http://localhost:3000': 'hrms', // HRMS portal (local dev)
   'https://pydah-pharmacy-labs.vercel.app': 'pharmacy',
 };
 

@@ -62,8 +62,9 @@ const Login = ({ portalInfo, onLoginSuccess, onBack }) => {
     setLoginError('');
 
     try {
-      // Unified login - no role parameter, backend will check rbac_users first, then student_credentials
-      const response = await authAPI.login(formData.username, formData.password);
+      // When HRMS portal: backend validates against HRMS MongoDB only. Otherwise CRM DBs.
+      const portalId = portalInfo?.portalId === 'hrms' ? 'hrms' : null;
+      const response = await authAPI.login(formData.username, formData.password, null, portalId);
 
       if (response.success) {
         // Store tokens

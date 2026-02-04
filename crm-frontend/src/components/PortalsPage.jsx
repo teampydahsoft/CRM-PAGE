@@ -43,7 +43,7 @@ const portalDetails = [
         features: ['Automated Payroll Processing', 'Leave & Attendance Mapping', 'Performance Appraisal Hub', 'Staff Self-Service Portal'],
         color: '#ec4899',
         image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
-        url: 'http://localhost:3000/login',
+        url: 'https://li-hrms.vercel.app/login',
         portalId: 'hrms'
     }
 ];

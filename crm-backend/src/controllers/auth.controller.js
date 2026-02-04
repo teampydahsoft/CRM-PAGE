@@ -1,7 +1,8 @@
-import { validateCredentials, generatePortalToken } from '../services/auth.service.js';
+import { validateCredentials, validateCredentialsForHRMS, generatePortalToken, getCRMUserForVerify } from '../services/auth.service.js';
 import { generateToken, verifyToken as verifyJWTToken } from '../services/token.service.js';
 import { decryptToken } from '../services/encryption.service.js';
-import { HTTP_STATUS, ERROR_MESSAGES, SUCCESS_MESSAGES, TOKEN_TYPES } from '../config/constants.js';
+import { findHRMSUserByEmail } from '../services/hrms.service.js';
+import { HTTP_STATUS, ERROR_MESSAGES, SUCCESS_MESSAGES, TOKEN_TYPES, PORTAL_IDS } from '../config/constants.js';
 
 /**
  * Authentication Controller
@@ -14,7 +15,7 @@ import { HTTP_STATUS, ERROR_MESSAGES, SUCCESS_MESSAGES, TOKEN_TYPES } from '../c
  */
 export const login = async (req, res, next) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password, role, portalId } = req.body;
 
     // Validate input
     if (!username || !password) {
@@ -24,8 +25,10 @@ export const login = async (req, res, next) => {
       });
     }
 
-    // Validate credentials (pass role if provided)
-    const user = await validateCredentials(username, password, role);
+    // When logging in via HRMS portal, validate against HRMS MongoDB only
+    const user = portalId === PORTAL_IDS.HRMS
+      ? await validateCredentialsForHRMS(username, password)
+      : await validateCredentials(username, password, role);
 
     if (!user) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
@@ -210,15 +213,65 @@ export const verifyToken = async (req, res, next) => {
       });
     }
 
+    const expiresAt = new Date(decoded.exp * 1000).toISOString();
+    const baseData = {
+      portalId: decoded.portalId,
+      role: decoded.role,
+      expiresAt
+    };
+
+    // For HRMS portal: return userId (and email) that HRMS can use to find User/Employee in its DB
+    if (decoded.portalId === PORTAL_IDS.HRMS) {
+      const crmUser = await getCRMUserForVerify(decoded.userId, decoded.databaseSource);
+      const email = crmUser?.email || null;
+
+      if (email) {
+        const hrmsIdentity = await findHRMSUserByEmail(email, crmUser?.employeeId);
+        if (hrmsIdentity) {
+          console.log(`[VerifyToken] HRMS lookup: resolved to userId=${hrmsIdentity.userId}`);
+          return res.status(HTTP_STATUS.OK).json({
+            success: true,
+            valid: true,
+            data: {
+              userId: hrmsIdentity.userId,
+              email: hrmsIdentity.email,
+              ...baseData
+            }
+          });
+        }
+        // No match in HRMS Mongo: send email as userId so HRMS can resolve by email
+        return res.status(HTTP_STATUS.OK).json({
+          success: true,
+          valid: true,
+          data: {
+            userId: email,
+            email,
+            ...baseData
+          }
+        });
+      }
+      // No email in CRM user: return CRM userId (HRMS may resolve by employee number or name)
+      return res.status(HTTP_STATUS.OK).json({
+        success: true,
+        valid: true,
+        data: {
+          userId: String(decoded.userId),
+          ...(crmUser?.email && { email: crmUser.email }),
+          ...baseData
+        }
+      });
+    }
+
+    // Non-HRMS portals: return CRM userId and optional email when available
+    const crmUser = await getCRMUserForVerify(decoded.userId, decoded.databaseSource);
     console.log(`[VerifyToken] Token verification successful. Returning response.`);
     res.status(HTTP_STATUS.OK).json({
       success: true,
       valid: true,
       data: {
         userId: decoded.userId,
-        portalId: decoded.portalId,
-        role: decoded.role,
-        expiresAt: new Date(decoded.exp * 1000).toISOString()
+        ...(crmUser?.email && { email: crmUser.email }),
+        ...baseData
       }
     });
   } catch (error) {

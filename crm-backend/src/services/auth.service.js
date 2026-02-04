@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
-import { findRBACUserByIdentifier } from '../models/rbac.model.js';
-import { findAdmissionsUserByEmail } from '../models/admissions.model.js';
-import { findStudentByUsername } from '../models/student.model.js';
+import { findRBACUserByIdentifier, findRBACUserById } from '../models/rbac.model.js';
+import { findAdmissionsUserByEmail, findAdmissionsUserById } from '../models/admissions.model.js';
+import { findStudentByUsername, findStudentById } from '../models/student.model.js';
+import { validateHRMSCredentials, getHRMSUserById } from './hrms.service.js';
 import { generateSSOToken } from './token.service.js';
 import { encryptToken } from './encryption.service.js';
 import { ERROR_MESSAGES } from '../config/constants.js';
@@ -107,6 +108,23 @@ export const validateCredentials = async (username, password, role = null) => {
 };
 
 /**
+ * Validate credentials against HRMS MongoDB only (when logging in via HRMS portal).
+ * @param {string} username - Email or username
+ * @param {string} password - Plain password
+ * @returns {Object|null} User object with portals: ['hrms'], databaseSource: 'hrms'
+ */
+export const validateCredentialsForHRMS = async (username, password) => {
+  const user = await validateHRMSCredentials(username, password);
+  if (!user) return null;
+  return {
+    ...user,
+    username: user.email || user.name,
+    portals: ['hrms'],
+    databaseSource: 'hrms'
+  };
+};
+
+/**
  * Generate encrypted SSO token for portal access
  * @param {string} userId - User ID
  * @param {string} portalId - Target portal identifier
@@ -128,14 +146,17 @@ export const generatePortalToken = async (userId, portalId, role, databaseSource
     } else if (databaseSource === 'student_credentials') {
       // Students have access to student-portal
       userPortals = ['student-portal'];
+    } else if (databaseSource === 'hrms') {
+      // HRMS users (from HRMS Mongo) have access to hrms portal only
+      userPortals = ['hrms'];
     }
     
     if (!userPortals.includes(portalId)) {
       throw new Error('User does not have access to this portal');
     }
 
-    // Generate SSO JWT token
-    const ssoToken = generateSSOToken(userId, portalId, role);
+    // Generate SSO JWT token (include databaseSource for HRMS verify-token lookup)
+    const ssoToken = generateSSOToken(userId, portalId, role, databaseSource);
     
     // Encrypt the token
     const encryptedToken = encryptToken(ssoToken);
@@ -144,6 +165,88 @@ export const generatePortalToken = async (userId, portalId, role, databaseSource
   } catch (error) {
     console.error('Portal token generation error:', error);
     throw new Error(error.message || ERROR_MESSAGES.TOKEN_GENERATION_FAILED);
+  }
+};
+
+/**
+ * Get CRM user identity by id for verify-token (e.g. to resolve email for HRMS).
+ * Tries databaseSource first if provided, then rbac → admissions → student.
+ * @param {string|number} userId - CRM user id
+ * @param {string} [databaseSource] - Optional: 'rbac_users', 'admissions_db', 'student_credentials'
+ * @returns {Promise<{ email?: string, name?: string, employeeId?: string }|null>}
+ */
+export const getCRMUserForVerify = async (userId, databaseSource = null) => {
+  try {
+    if (databaseSource === 'hrms') {
+      const hrmsUser = await getHRMSUserById(userId);
+      if (hrmsUser) {
+        return {
+          email: hrmsUser.email || null,
+          name: hrmsUser.name || null,
+          employeeId: hrmsUser.employeeId || null
+        };
+      }
+      return null;
+    }
+    if (databaseSource === 'rbac_users') {
+      const user = await findRBACUserById(userId);
+      if (user) {
+        return {
+          email: user.email || null,
+          name: user.name || user.username || null,
+          employeeId: user.employeeId || user.employee_id || null
+        };
+      }
+    }
+    if (databaseSource === 'admissions_db') {
+      const user = await findAdmissionsUserById(userId);
+      if (user) {
+        return {
+          email: user.email || null,
+          name: user.name || null,
+          employeeId: user.employeeId || user.employee_id || null
+        };
+      }
+    }
+    if (databaseSource === 'student_credentials') {
+      const user = await findStudentById(userId);
+      if (user) {
+        return {
+          email: user.email || null,
+          name: user.name || user.username || null,
+          employeeId: user.employeeId || user.employee_id || null
+        };
+      }
+    }
+    // Fallback: try all sources (for tokens issued before databaseSource was added)
+    let user = await findRBACUserById(userId);
+    if (user) {
+      return {
+        email: user.email || null,
+        name: user.name || user.username || null,
+        employeeId: user.employeeId || user.employee_id || null
+      };
+    }
+    user = await findAdmissionsUserById(userId);
+    if (user) {
+      return {
+        email: user.email || null,
+        name: user.name || null,
+        employeeId: user.employeeId || user.employee_id || null
+      };
+    }
+    user = await findStudentById(userId);
+    if (user) {
+      return {
+        email: user.email || null,
+        name: user.name || user.username || null,
+        employeeId: user.employeeId || user.employee_id || null
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('[Auth] getCRMUserForVerify error:', error);
+    return null;
   }
 };
 
@@ -169,7 +272,9 @@ export const comparePassword = async (password, hash) => {
 
 export default {
   validateCredentials,
+  validateCredentialsForHRMS,
   generatePortalToken,
+  getCRMUserForVerify,
   hashPassword,
   comparePassword
 };

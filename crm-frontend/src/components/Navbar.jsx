@@ -35,14 +35,14 @@ const solutions = [
   {
     title: 'Employee Portal',
     desc: 'Secure login for staff and faculty members.',
-    url: 'https://hrms.pydahsoft.in/login',
+    url: 'https://li-hrms.vercel.app/login',
     icon: ClipboardCheck,
     color: '#ec4899'
   },
   {
     title: 'HR & Payroll',
     desc: 'Comprehensive HR management for institutions.',
-    url: 'https://hrms.pydahsoft.in',
+    url: 'https://li-hrms.vercel.app',
     icon: CreditCard,
     color: '#ef4444'
   },

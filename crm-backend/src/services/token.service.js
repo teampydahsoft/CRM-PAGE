@@ -68,9 +68,10 @@ export const verifyToken = (token) => {
  * @param {string} userId - User ID
  * @param {string} portalId - Target portal identifier
  * @param {string} role - User role
+ * @param {string} [databaseSource] - Which CRM DB user came from (rbac_users, admissions_db, student_credentials); used for HRMS verify-token lookup
  * @returns {string} SSO JWT token
  */
-export const generateSSOToken = (userId, portalId, role) => {
+export const generateSSOToken = (userId, portalId, role, databaseSource = null) => {
   const payload = {
     userId,
     portalId,
@@ -78,7 +79,9 @@ export const generateSSOToken = (userId, portalId, role) => {
     issuer: 'crm-auth-gateway',
     timestamp: Date.now()
   };
-
+  if (databaseSource) {
+    payload.databaseSource = databaseSource;
+  }
   return generateToken(payload, TOKEN_TYPES.SSO);
 };
 
