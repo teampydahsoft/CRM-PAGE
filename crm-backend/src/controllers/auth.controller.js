@@ -1,7 +1,8 @@
-import { validateCredentials, validateCredentialsForHRMS, generatePortalToken, getCRMUserForVerify } from '../services/auth.service.js';
+import { validateCredentials, validateCredentialsForHRMS, validateCredentialsForHostel, generatePortalToken, getCRMUserForVerify } from '../services/auth.service.js';
 import { generateToken, verifyToken as verifyJWTToken } from '../services/token.service.js';
 import { decryptToken } from '../services/encryption.service.js';
 import { findHRMSUserByEmail } from '../services/hrms.service.js';
+import { findHostelUserForVerify } from '../services/hostel.service.js';
 import { HTTP_STATUS, ERROR_MESSAGES, SUCCESS_MESSAGES, TOKEN_TYPES, PORTAL_IDS } from '../config/constants.js';
 
 /**
@@ -26,9 +27,15 @@ export const login = async (req, res, next) => {
     }
 
     // When logging in via HRMS portal, validate against HRMS MongoDB only
-    const user = portalId === PORTAL_IDS.HRMS
-      ? await validateCredentialsForHRMS(username, password)
-      : await validateCredentials(username, password, role);
+    // When logging in via Hostel portal, validate against Hostel MongoDB only (admins + users)
+    let user;
+    if (portalId === PORTAL_IDS.HRMS) {
+      user = await validateCredentialsForHRMS(username, password);
+    } else if (portalId === PORTAL_IDS.HOSTEL_AUTOMATION) {
+      user = await validateCredentialsForHostel(username, password);
+    } else {
+      user = await validateCredentials(username, password, role);
+    }
 
     if (!user) {
       return res.status(HTTP_STATUS.UNAUTHORIZED).json({
@@ -262,7 +269,58 @@ export const verifyToken = async (req, res, next) => {
       });
     }
 
-    // Non-HRMS portals: return CRM userId and optional email when available
+    // For Hostel portal: return userId (and role/email/username) that HMS can use to find User/Admin in its DB
+    if (decoded.portalId === PORTAL_IDS.HOSTEL_AUTOMATION) {
+      const crmUser = await getCRMUserForVerify(decoded.userId, decoded.databaseSource);
+      const email = crmUser?.email || null;
+      const username = crmUser?.username || crmUser?.name || null;
+
+      // If user logged in via hostel, decoded.userId is already hostel _id
+      if (decoded.databaseSource === 'hostel') {
+        const hostelUser = await getCRMUserForVerify(decoded.userId, 'hostel');
+        return res.status(HTTP_STATUS.OK).json({
+          success: true,
+          valid: true,
+          data: {
+            userId: String(decoded.userId),
+            ...(hostelUser?.email && { email: hostelUser.email }),
+            ...(hostelUser?.username && { username: hostelUser.username }),
+            role: decoded.role,
+            ...baseData
+          }
+        });
+      }
+
+      // CRM user (rbac/admissions/student): resolve to hostel identity for HMS
+      const hostelIdentity = await findHostelUserForVerify(email, username, null);
+      if (hostelIdentity) {
+        console.log(`[VerifyToken] Hostel lookup: resolved to userId=${hostelIdentity.userId}`);
+        return res.status(HTTP_STATUS.OK).json({
+          success: true,
+          valid: true,
+          data: {
+            userId: hostelIdentity.userId,
+            ...(hostelIdentity.email && { email: hostelIdentity.email }),
+            ...(hostelIdentity.username && { username: hostelIdentity.username }),
+            ...(hostelIdentity.role && { role: hostelIdentity.role }),
+            ...baseData
+          }
+        });
+      }
+      // No match in Hostel Mongo: return CRM userId and email/username so HMS can try to resolve
+      return res.status(HTTP_STATUS.OK).json({
+        success: true,
+        valid: true,
+        data: {
+          userId: String(decoded.userId),
+          ...(email && { email }),
+          ...(username && { username }),
+          ...baseData
+        }
+      });
+    }
+
+    // Non-HRMS/Hostel portals: return CRM userId and optional email when available
     const crmUser = await getCRMUserForVerify(decoded.userId, decoded.databaseSource);
     console.log(`[VerifyToken] Token verification successful. Returning response.`);
     res.status(HTTP_STATUS.OK).json({

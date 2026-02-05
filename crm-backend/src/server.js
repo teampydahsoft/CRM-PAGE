@@ -33,7 +33,8 @@ const productionOrigins = [
   'https://pydahsdms.vercel.app',        // Production student portal
   'https://pydah-admissions.vercel.app', // Development portal application
   'https://li-hrms.vercel.app',          // HRMS portal (SSO redirect target; may call CRM backend from browser)
-  'http://localhost:3000',               // Local student / HRMS portal application
+  'https://hms.pydahsoft.in',            // Hostel management system (HMS) production
+  'http://localhost:3000',               // Local hostel software (and/or student/HRMS portal in dev)
   'http://localhost:5173'               // Local CRM frontend
 ];
 

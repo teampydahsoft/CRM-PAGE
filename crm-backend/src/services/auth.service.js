@@ -3,6 +3,7 @@ import { findRBACUserByIdentifier, findRBACUserById } from '../models/rbac.model
 import { findAdmissionsUserByEmail, findAdmissionsUserById } from '../models/admissions.model.js';
 import { findStudentByUsername, findStudentById } from '../models/student.model.js';
 import { validateHRMSCredentials, getHRMSUserById } from './hrms.service.js';
+import { validateHostelCredentials, getHostelUserById } from './hostel.service.js';
 import { generateSSOToken } from './token.service.js';
 import { encryptToken } from './encryption.service.js';
 import { ERROR_MESSAGES } from '../config/constants.js';
@@ -125,6 +126,23 @@ export const validateCredentialsForHRMS = async (username, password) => {
 };
 
 /**
+ * Validate credentials against Hostel MongoDB only (when logging in via Hostel portal).
+ * Uses collections: admins (username + password), users (rollNumber/admissionNumber + password).
+ * @param {string} username - Admin username or student rollNumber/admissionNumber
+ * @param {string} password - Plain password
+ * @returns {Object|null} User object with portals: ['hostel-automation'], databaseSource: 'hostel'
+ */
+export const validateCredentialsForHostel = async (username, password) => {
+  const user = await validateHostelCredentials(username, password);
+  if (!user) return null;
+  return {
+    ...user,
+    portals: ['hostel-automation'],
+    databaseSource: 'hostel'
+  };
+};
+
+/**
  * Generate encrypted SSO token for portal access
  * @param {string} userId - User ID
  * @param {string} portalId - Target portal identifier
@@ -149,6 +167,9 @@ export const generatePortalToken = async (userId, portalId, role, databaseSource
     } else if (databaseSource === 'hrms') {
       // HRMS users (from HRMS Mongo) have access to hrms portal only
       userPortals = ['hrms'];
+    } else if (databaseSource === 'hostel') {
+      // Hostel users (from Hostel Mongo) have access to hostel-automation portal only
+      userPortals = ['hostel-automation'];
     }
     
     if (!userPortals.includes(portalId)) {
@@ -184,6 +205,17 @@ export const getCRMUserForVerify = async (userId, databaseSource = null) => {
           email: hrmsUser.email || null,
           name: hrmsUser.name || null,
           employeeId: hrmsUser.employeeId || null
+        };
+      }
+      return null;
+    }
+    if (databaseSource === 'hostel') {
+      const hostelUser = await getHostelUserById(userId);
+      if (hostelUser) {
+        return {
+          email: hostelUser.email || null,
+          name: hostelUser.name || null,
+          username: hostelUser.username || null
         };
       }
       return null;
@@ -273,6 +305,7 @@ export const comparePassword = async (password, hash) => {
 export default {
   validateCredentials,
   validateCredentialsForHRMS,
+  validateCredentialsForHostel,
   generatePortalToken,
   getCRMUserForVerify,
   hashPassword,

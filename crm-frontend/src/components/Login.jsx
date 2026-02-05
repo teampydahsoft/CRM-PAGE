@@ -62,8 +62,11 @@ const Login = ({ portalInfo, onLoginSuccess, onBack }) => {
     setLoginError('');
 
     try {
-      // When HRMS portal: backend validates against HRMS MongoDB only. Otherwise CRM DBs.
-      const portalId = portalInfo?.portalId === 'hrms' ? 'hrms' : null;
+      // When HRMS portal: backend validates against HRMS MongoDB only.
+      // When Hostel portal: backend validates against Hostel MongoDB (admins + users) only.
+      const portalId = (portalInfo?.portalId === 'hrms' || portalInfo?.portalId === 'hostel-automation')
+        ? portalInfo.portalId
+        : null;
       const response = await authAPI.login(formData.username, formData.password, null, portalId);
 
       if (response.success) {

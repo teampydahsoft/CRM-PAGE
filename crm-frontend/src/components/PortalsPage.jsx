@@ -33,7 +33,7 @@ const portalDetails = [
         features: ['Smart Room Allocation', 'Security & Visitor Logs', 'Automated Mess Management', 'Student Safety Dashboard'],
         color: '#6366f1',
         image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
-        url: 'http://localhost:3000/login',
+        url: 'https://hms.pydahsoft.in/login',
         portalId: 'hostel-automation'
     },
     {

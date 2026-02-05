@@ -8,12 +8,15 @@ dotenv.config();
  * Database Configuration
  * MySQL connection pool setup for multiple databases
  * HRMS MongoDB connection (optional, for SSO verify-token user resolution)
+ * Hostel MongoDB connection (optional, separate database for hostel software)
  */
 
 let studentPool = null;
 let admissionsPool = null;
 let hrmsMongoClient = null;
 let hrmsMongoDb = null;
+let hostelMongoClient = null;
+let hostelMongoDb = null;
 
 /**
  * Create MySQL connection pool for student database
@@ -124,7 +127,12 @@ export const connectDatabase = async () => {
       await connectHRMSMongo();
     }
 
-    return { studentPool, admissionsPool, hrmsMongoDb };
+    // Connect to Hostel MongoDB if configured
+    if (process.env.HOSTEL_MONGO_URI || process.env.HOSTEL_MONGO_URL) {
+      await connectHostelMongo();
+    }
+
+    return { studentPool, admissionsPool, hrmsMongoDb, hostelMongoDb };
   } catch (error) {
     console.error('❌ Database connection error:', error);
     throw error;
@@ -151,6 +159,12 @@ export const closeDatabase = async () => {
       hrmsMongoClient = null;
       hrmsMongoDb = null;
       console.log('✅ HRMS MongoDB connection closed');
+    }
+    if (hostelMongoClient) {
+      await hostelMongoClient.close();
+      hostelMongoClient = null;
+      hostelMongoDb = null;
+      console.log('✅ Hostel MongoDB connection closed');
     }
   } catch (error) {
     console.error('❌ Error closing database connection:', error);
@@ -196,6 +210,43 @@ export const getHRMSDb = async () => {
   return connectHRMSMongo();
 };
 
+/**
+ * Connect to Hostel MongoDB (optional; when HOSTEL_MONGO_URI or HOSTEL_MONGO_URL is set)
+ * @returns {Promise<import('mongodb').Db|null>} Hostel db instance or null
+ */
+export const connectHostelMongo = async () => {
+  const uri = process.env.HOSTEL_MONGO_URI || process.env.HOSTEL_MONGO_URL;
+  if (!uri) {
+    return null;
+  }
+  if (hostelMongoClient) {
+    return hostelMongoDb;
+  }
+  try {
+    hostelMongoClient = new MongoClient(uri);
+    await hostelMongoClient.connect();
+    hostelMongoDb = hostelMongoClient.db();
+    console.log('✅ Hostel MongoDB connection established');
+    return hostelMongoDb;
+  } catch (error) {
+    console.error('❌ Hostel MongoDB connection error:', error.message);
+    hostelMongoClient = null;
+    hostelMongoDb = null;
+    return null;
+  }
+};
+
+/**
+ * Get Hostel MongoDB db instance (lazy connect if URI is set)
+ * @returns {Promise<import('mongodb').Db|null>} Hostel db or null if not configured
+ */
+export const getHostelDb = async () => {
+  if (hostelMongoDb) {
+    return hostelMongoDb;
+  }
+  return connectHostelMongo();
+};
+
 export default {
   createPool,
   createStudentPool,
@@ -204,6 +255,8 @@ export default {
   closeDatabase,
   connectHRMSMongo,
   getHRMSDb,
+  connectHostelMongo,
+  getHostelDb,
   getPool,
   getStudentPool,
   getAdmissionsPool,

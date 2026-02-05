@@ -138,7 +138,7 @@ export const PORTAL_IDS = {
   'https://hms.pydahsoft.in': 'hostel-automation',
   'https://hrms.pydahsoft.in': 'hrms',
   'https://li-hrms.vercel.app': 'hrms', // HRMS portal
-  'http://localhost:3000': 'hrms', // HRMS portal (local dev)
+  'http://localhost:3000': 'hostel-automation', // Hostel software (local dev; HRMS local may use another port)
   'https://pydah-pharmacy-labs.vercel.app': 'pharmacy',
 };
 
