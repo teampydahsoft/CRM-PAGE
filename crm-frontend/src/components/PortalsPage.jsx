@@ -107,10 +107,10 @@ const PortalsPage = ({ onBack, onPortalClick }) => {
             <div className="section-container px-6 sm:px-10 lg:px-12 relative z-10">
                 <div className="flex flex-col gap-24 lg:gap-64 md:gap-80">
                     {portalDetails.map((portal, idx) => (
-                        <PortalSection 
-                            key={portal.title} 
-                            portal={portal} 
-                            idx={idx} 
+                        <PortalSection
+                            key={portal.title}
+                            portal={portal}
+                            idx={idx}
                             isMobile={isMobile}
                             onPortalClick={onPortalClick}
                         />
@@ -135,20 +135,20 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
 
     const handlePortalClick = async (e) => {
         e.preventDefault();
-        
+
         // Check if user is already authenticated
         const accessToken = localStorage.getItem('accessToken');
-        
+
         if (accessToken) {
             // User is already logged in, generate token (or use cached) and redirect directly
             try {
                 // Try to use cached token first, generate new if needed
                 const tokenResponse = await authAPI.generatePortalToken(portal.portalId, false);
-                
+
                 if (tokenResponse.success) {
                     // For Student Portal, determine redirect URL based on user's databaseSource
                     let redirectUrl = portal.url;
-                    
+
                     if (portal.portalId === 'student-portal') {
                         // Get user info from localStorage to determine databaseSource
                         const userStr = localStorage.getItem('user');
@@ -156,7 +156,7 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
                             try {
                                 const user = JSON.parse(userStr);
                                 const baseUrl = new URL(portal.url).origin;
-                                
+
                                 // If user is from rbac_users, redirect to /login (staff/admin)
                                 // If user is from student_credentials, redirect to /student/login (student)
                                 if (user.databaseSource === 'rbac_users') {
@@ -171,7 +171,7 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
                             }
                         }
                     }
-                    
+
                     // Redirect to portal with encrypted token
                     const portalUrl = new URL(redirectUrl);
                     portalUrl.searchParams.set('token', tokenResponse.data.encryptedToken);
@@ -183,7 +183,7 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
                 // If token generation fails, fall through to login page
             }
         }
-        
+
         // If not authenticated or token generation failed, show login page
         if (onPortalClick) {
             onPortalClick({

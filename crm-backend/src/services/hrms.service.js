@@ -64,54 +64,86 @@ export const validateHRMSCredentials = async (username, password) => {
   const identifier = username.trim();
 
   try {
-    // 1) User collection: by email or username, active only
+    console.log(`[Auth-HRMS] Checking user collection for identifier: ${identifier}`);
     let doc = await userCol.findOne({
       $and: [
         { $or: [{ email: identifier }, { username: identifier }] },
         { $or: [{ isActive: true }, { isActive: { $exists: false } }] }
       ]
     });
+    
     if (!doc) {
+      console.log(`[Auth-HRMS] No active user found, checking all users for identifier: ${identifier}`);
       doc = await userCol.findOne({
         $or: [{ email: identifier }, { username: identifier }]
       });
     }
-    if (doc && getPasswordHash(doc)) {
-      const valid = await bcrypt.compare(password, getPasswordHash(doc));
-      if (valid) {
-        console.log(`[Auth] HRMS user found: ${doc._id}, email: ${doc.email}`);
-        return {
-          id: doc._id.toString(),
-          email: doc.email || null,
-          name: doc.name || doc.username || null,
-          role: doc.role || 'user',
-          databaseSource: 'hrms'
-        };
+
+    if (doc) {
+      console.log(`[Auth-HRMS] Found document in users: ${doc._id}, Active: ${doc.isActive}`);
+      const hash = getPasswordHash(doc);
+      if (hash) {
+        console.log(`[Auth-HRMS] Verifying password for user: ${doc.email || doc.username}`);
+        const valid = await bcrypt.compare(password, hash);
+        if (valid) {
+          console.log(`[Auth-HRMS] HRMS user validated successfully: ${doc._id}`);
+          return {
+            id: doc._id.toString(),
+            email: doc.email || null,
+            name: doc.name || doc.username || null,
+            role: doc.role || 'user',
+            databaseSource: 'hrms'
+          };
+        } else {
+          console.log(`[Auth-HRMS] Password mismatch for user: ${doc.email || doc.username}`);
+        }
+      } else {
+        console.log(`[Auth-HRMS] No password hash found for user: ${doc.email || doc.username}`);
       }
+    } else {
+      console.log(`[Auth-HRMS] No document found in users collection for identifier: ${identifier}`);
     }
 
-    // 2) Employee collection: by email, active only
+    console.log(`[Auth-HRMS] Checking employees collection for identifier: ${identifier}`);
+    const upperId = identifier.toUpperCase();
+    // 2) Employee collection: by email or emp_no, active only
     doc = await empCol.findOne({
       $and: [
-        { email: identifier },
+        { $or: [{ email: identifier }, { emp_no: upperId }, { emp_no: identifier }] },
         { $or: [{ is_active: true }, { is_active: { $exists: false } }] }
       ]
     });
+
     if (!doc) {
-      doc = await empCol.findOne({ email: identifier });
+      console.log(`[Auth-HRMS] No active employee found, checking all employees for identifier: ${identifier}`);
+      doc = await empCol.findOne({
+        $or: [{ email: identifier }, { emp_no: upperId }, { emp_no: identifier }]
+      });
     }
-    if (doc && getPasswordHash(doc)) {
-      const valid = await bcrypt.compare(password, getPasswordHash(doc));
-      if (valid) {
-        console.log(`[Auth] HRMS employee found: ${doc._id}, email: ${doc.email}`);
-        return {
-          id: doc._id.toString(),
-          email: doc.email || null,
-          name: doc.employee_name || doc.name || null,
-          role: doc.role || 'user',
-          databaseSource: 'hrms'
-        };
+
+    if (doc) {
+      console.log(`[Auth-HRMS] Found document in employees: ${doc._id}, Active: ${doc.is_active}`);
+      const hash = getPasswordHash(doc);
+      if (hash) {
+        console.log(`[Auth-HRMS] Verifying password for employee: ${doc.email}`);
+        const valid = await bcrypt.compare(password, hash);
+        if (valid) {
+          console.log(`[Auth-HRMS] HRMS employee validated successfully: ${doc._id}`);
+          return {
+            id: doc._id.toString(),
+            email: doc.email || null,
+            name: doc.employee_name || doc.name || null,
+            role: doc.role || 'user',
+            databaseSource: 'hrms'
+          };
+        } else {
+          console.log(`[Auth-HRMS] Password mismatch for employee: ${doc.email}`);
+        }
+      } else {
+        console.log(`[Auth-HRMS] No password hash found for employee: ${doc.email}`);
       }
+    } else {
+      console.log(`[Auth-HRMS] No document found in employees collection for email: ${identifier}`);
     }
 
     console.log(`[Auth] HRMS: user not found or invalid password for: ${identifier}`);
