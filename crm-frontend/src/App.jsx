@@ -8,6 +8,7 @@ import CTASection from './components/CTASection';
 import Footer from './components/Footer';
 import PortalsPage from './components/PortalsPage';
 import Login from './components/Login';
+import { authAPI } from './services/api';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -18,7 +19,45 @@ function App() {
     window.scrollTo(0, 0);
   };
 
-  const handlePortalClick = (portalInfo) => {
+  const handlePortalClick = async (portalInfo) => {
+    // Check if user is already authenticated
+    const accessToken = localStorage.getItem('accessToken');
+
+    if (accessToken) {
+      // User is already logged in, generate token (or use cached) and redirect directly
+      try {
+        // Try to use cached token first, generate new if needed
+        const tokenResponse = await authAPI.generatePortalToken(portalInfo.portalId, false);
+
+        if (tokenResponse.success) {
+          let redirectUrl = portalInfo.url;
+
+          // Special logic for Student Portal
+          if (portalInfo.portalId === 'student-portal') {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+              const user = JSON.parse(userStr);
+              const baseUrl = new URL(portalInfo.url).origin;
+              if (user.databaseSource === 'rbac_users') {
+                redirectUrl = `${baseUrl}/login`;
+              } else {
+                redirectUrl = `${baseUrl}/student/login`;
+              }
+            }
+          }
+
+          // Redirect to portal with encrypted token
+          const portalUrl = new URL(redirectUrl);
+          portalUrl.searchParams.set('token', tokenResponse.data.encryptedToken);
+          window.location.href = portalUrl.toString();
+          return;
+        }
+      } catch (error) {
+        console.error('Portal redirect error:', error);
+      }
+    }
+
+    // Default: fallback to login page if no token or generation fails
     setSelectedPortal(portalInfo);
     setCurrentPage('login');
     window.scrollTo(0, 0);
@@ -37,7 +76,7 @@ function App() {
   return (
     <div className="app">
       <div className="cloud-bg" />
-      <Navbar onNavigate={handleNavigate} />
+      <Navbar onNavigate={handleNavigate} onPortalClick={handlePortalClick} />
 
       <main>
         {currentPage === 'home' ? (
@@ -55,7 +94,7 @@ function App() {
             onBack={handleLoginBack}
           />
         ) : currentPage === 'portals' ? (
-          <PortalsPage 
+          <PortalsPage
             onBack={() => handleNavigate('home')}
             onPortalClick={handlePortalClick}
           />

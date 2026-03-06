@@ -9,53 +9,60 @@ const solutions = [
     desc: 'Next-generation enrollment and lead management.',
     url: 'https://admissions.pydahsoft.in',
     icon: Users,
-    color: '#0ea5e9'
+    color: '#0ea5e9',
+    portalId: 'admissions-crm'
   },
   {
     title: 'Hostel Automation',
     desc: 'Smart and secure student residency management.',
     url: 'https://hms.pydahsoft.in',
     icon: Home,
-    color: '#6366f1'
+    color: '#6366f1',
+    portalId: 'hostel-automation'
   },
   {
     title: 'Pharmacy Inventory',
     desc: 'Specially crafted stock management for college labs.',
     url: 'https://pydah-pharmacy-labs.vercel.app',
     icon: Box,
-    color: '#10b981'
+    color: '#10b981',
+    portalId: 'pharmacy'
   },
   {
     title: 'Student Portal',
     desc: 'Unified dashboard for student academics and life.',
     url: 'https://pydahsdms.vercel.app',
     icon: UserCircle,
-    color: '#f59e0b'
+    color: '#f59e0b',
+    portalId: 'student-portal'
   },
   {
     title: 'Employee Portal',
     desc: 'Secure login for staff and faculty members.',
     url: 'https://li-hrms.vercel.app/login',
     icon: ClipboardCheck,
-    color: '#ec4899'
+    color: '#ec4899',
+    portalId: 'hrms'
   },
   {
     title: 'HR & Payroll',
     desc: 'Comprehensive HR management for institutions.',
     url: 'https://li-hrms.vercel.app',
     icon: CreditCard,
-    color: '#ef4444'
+    color: '#ef4444',
+    portalId: 'hrms'
   },
   {
     title: 'Administration',
     desc: 'Centralized control system for campus admins.',
     url: 'https://pydahsdms.vercel.app',
     icon: Layout,
-    color: '#64748b'
+    color: '#64748b',
+    portalId: 'student-portal'
   }
 ];
 
-const Navbar = ({ onNavigate }) => {
+const Navbar = ({ onNavigate, onPortalClick }) => {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const closeTimeoutRef = useRef(null);
@@ -136,7 +143,7 @@ const Navbar = ({ onNavigate }) => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="fixed left-1/2 -translate-x-1/2 w-[min(920px,92vw)] max-w-[920px] bg-white rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-slate-100 z-[2000] max-h-[calc(100vh-120px)] overflow-y-auto"
+                  className="fixed left-1/2 -translate-x-1/2 w-[min(920px,92vw)] max-w-[920px] bg-white rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.15)] border border-slate-100 z-[2000] max-h-[calc(100vh-120px)] overflow-y-auto"
                   style={{
                     top: 'clamp(75px, 15vw, 85px)',
                     padding: 'clamp(1.5rem, 3.5vw, 2.5rem)'
@@ -145,35 +152,47 @@ const Navbar = ({ onNavigate }) => {
                   {/* Mega Menu Grid */}
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))]" style={{ gap: 'clamp(1.25rem, 2.5vw, 2rem)' }}>
                     {solutions.map((item, idx) => (
-                      <a
+                      <motion.a
                         key={idx}
                         href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex rounded-2xl transition-all duration-200 cursor-pointer hover:bg-slate-50"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsMegaMenuOpen(false);
+                          if (onPortalClick) onPortalClick(item);
+                        }}
+                        whileHover={{
+                          backgroundColor: `${item.color}08`,
+                          x: 5,
+                          transition: { duration: 0.2 }
+                        }}
+                        className="flex rounded-2xl transition-all duration-200 cursor-pointer group"
                         style={{
                           gap: 'clamp(0.875rem, 2vw, 1rem)',
                           padding: 'clamp(0.875rem, 2vw, 1.25rem)'
                         }}
                       >
                         <div
-                          className="rounded-xl flex justify-center items-center flex-shrink-0"
+                          className="rounded-xl flex justify-center items-center flex-shrink-0 transition-all duration-300 group-hover:scale-110"
                           style={{
                             width: 'clamp(2.5rem, 3vw, 2.75rem)',
                             height: 'clamp(2.5rem, 3vw, 2.75rem)',
-                            backgroundColor: `${item.color}10`,
-                            color: item.color
+                            backgroundColor: `${item.color}15`,
+                            color: item.color,
+                            boxShadow: `0 0 20px ${item.color}10`
                           }}
                         >
                           <item.icon size={22} />
                         </div>
                         <div style={{ minWidth: 0 }}>
-                          <div className="font-bold" style={{
+                          <div className="font-bold transition-colors duration-300" style={{
                             color: 'var(--color-text-main)',
                             fontSize: 'clamp(0.875rem, 1.8vw, 0.95rem)',
                             marginBottom: 'clamp(0.25rem, 0.6vw, 0.375rem)',
                             lineHeight: '1.3'
-                          }}>
+                          }}
+                            onMouseEnter={(e) => e.target.style.color = item.color}
+                            onMouseLeave={(e) => e.target.style.color = 'var(--color-text-main)'}
+                          >
                             {item.title}
                           </div>
                           <div className="leading-snug" style={{
@@ -184,7 +203,7 @@ const Navbar = ({ onNavigate }) => {
                             {item.desc}
                           </div>
                         </div>
-                      </a>
+                      </motion.a>
                     ))}
                   </div>
                 </motion.div>
@@ -310,24 +329,29 @@ const Navbar = ({ onNavigate }) => {
                         maxHeight: 'none'
                       }}>
                         {solutions.map((item, idx) => (
-                          <a
+                          <motion.a
                             key={idx}
                             href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex rounded-xl bg-slate-50 transition-all duration-200"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setIsMobileMenuOpen(false);
+                              if (onPortalClick) onPortalClick(item);
+                            }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex rounded-xl transition-all duration-200 group"
                             style={{
                               gap: 'clamp(0.75rem, 1.8vw, 0.875rem)',
-                              padding: 'clamp(0.75rem, 1.8vw, 0.875rem)'
+                              padding: 'clamp(0.75rem, 1.8vw, 0.875rem)',
+                              backgroundColor: `${item.color}05`,
+                              border: `1px solid ${item.color}10`
                             }}
-                            onClick={() => setIsMobileMenuOpen(false)}
                           >
                             <div
-                              className="rounded-[10px] flex justify-center items-center flex-shrink-0"
+                              className="rounded-[10px] flex justify-center items-center flex-shrink-0 transition-colors duration-300"
                               style={{
                                 width: 'clamp(2.25rem, 3.5vw, 2.5rem)',
                                 height: 'clamp(2.25rem, 3.5vw, 2.5rem)',
-                                backgroundColor: `${item.color}10`,
+                                backgroundColor: `${item.color}15`,
                                 color: item.color
                               }}
                             >
@@ -335,7 +359,7 @@ const Navbar = ({ onNavigate }) => {
                             </div>
                             <div style={{ minWidth: 0 }}>
                               <div className="font-bold" style={{
-                                color: 'var(--color-text-main)',
+                                color: item.color,
                                 fontSize: 'clamp(0.8125rem, 1.6vw, 0.875rem)',
                                 marginBottom: 'clamp(0.25rem, 0.6vw, 0.375rem)',
                                 lineHeight: '1.3'
@@ -350,7 +374,7 @@ const Navbar = ({ onNavigate }) => {
                                 {item.desc}
                               </div>
                             </div>
-                          </a>
+                          </motion.a>
                         ))}
                       </div>
                     </motion.div>
