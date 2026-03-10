@@ -17,6 +17,8 @@ let hrmsMongoClient = null;
 let hrmsMongoDb = null;
 let hostelMongoClient = null;
 let hostelMongoDb = null;
+let transportMongoClient = null;
+let transportMongoDb = null;
 
 /**
  * Create MySQL connection pool for student database
@@ -132,7 +134,12 @@ export const connectDatabase = async () => {
       await connectHostelMongo();
     }
 
-    return { studentPool, admissionsPool, hrmsMongoDb, hostelMongoDb };
+    // Connect to Transport MongoDB if configured
+    if (process.env.TRANSPORT_MONGO_URI || process.env.TRANSPORT_MONGO_URL) {
+      await connectTransportMongo();
+    }
+
+    return { studentPool, admissionsPool, hrmsMongoDb, hostelMongoDb, transportMongoDb };
   } catch (error) {
     console.error('❌ Database connection error:', error);
     throw error;
@@ -165,6 +172,12 @@ export const closeDatabase = async () => {
       hostelMongoClient = null;
       hostelMongoDb = null;
       console.log('✅ Hostel MongoDB connection closed');
+    }
+    if (transportMongoClient) {
+      await transportMongoClient.close();
+      transportMongoClient = null;
+      transportMongoDb = null;
+      console.log('✅ Transport MongoDB connection closed');
     }
   } catch (error) {
     console.error('❌ Error closing database connection:', error);
@@ -247,6 +260,43 @@ export const getHostelDb = async () => {
   return connectHostelMongo();
 };
 
+/**
+ * Connect to Transport MongoDB (optional; when TRANSPORT_MONGO_URI is set)
+ * @returns {Promise<import('mongodb').Db|null>} Transport db instance or null
+ */
+export const connectTransportMongo = async () => {
+  const uri = process.env.TRANSPORT_MONGO_URI || process.env.TRANSPORT_MONGO_URL;
+  if (!uri) {
+    return null;
+  }
+  if (transportMongoClient) {
+    return transportMongoDb;
+  }
+  try {
+    transportMongoClient = new MongoClient(uri);
+    await transportMongoClient.connect();
+    transportMongoDb = transportMongoClient.db();
+    console.log('✅ Transport MongoDB connection established');
+    return transportMongoDb;
+  } catch (error) {
+    console.error('❌ Transport MongoDB connection error:', error.message);
+    transportMongoClient = null;
+    transportMongoDb = null;
+    return null;
+  }
+};
+
+/**
+ * Get Transport MongoDB db instance (lazy connect if URI is set)
+ * @returns {Promise<import('mongodb').Db|null>} Transport db or null if not configured
+ */
+export const getTransportDb = async () => {
+  if (transportMongoDb) {
+    return transportMongoDb;
+  }
+  return connectTransportMongo();
+};
+
 export default {
   createPool,
   createStudentPool,
@@ -257,6 +307,8 @@ export default {
   getHRMSDb,
   connectHostelMongo,
   getHostelDb,
+  connectTransportMongo,
+  getTransportDb,
   getPool,
   getStudentPool,
   getAdmissionsPool,

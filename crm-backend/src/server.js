@@ -36,7 +36,8 @@ const productionOrigins = [
   'https://hms.pydahsoft.in',            // Hostel management system (HMS) production
   'http://localhost:3000',               // Local hostel software (and/or student/HRMS portal in dev)
   'http://localhost:5000',               // Local HRMS backend
-  'http://localhost:5173'               // Local CRM frontend
+  'http://localhost:5173',               // Local CRM frontend
+  'http://localhost:5175'                // Local Transport frontend
 ];
 
 // Combine and remove duplicates

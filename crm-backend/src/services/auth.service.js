@@ -4,6 +4,7 @@ import { findAdmissionsUserByEmail, findAdmissionsUserById } from '../models/adm
 import { findStudentByUsername, findStudentById } from '../models/student.model.js';
 import { validateHRMSCredentials, getHRMSUserById } from './hrms.service.js';
 import { validateHostelCredentials, getHostelUserById } from './hostel.service.js';
+import { validateTransportCredentials, getTransportUserById } from './transport.service.js';
 import { generateSSOToken } from './token.service.js';
 import { encryptToken } from './encryption.service.js';
 import { ERROR_MESSAGES } from '../config/constants.js';
@@ -143,6 +144,43 @@ export const validateCredentialsForHostel = async (username, password) => {
 };
 
 /**
+ * Validate credentials against Transport MongoDB, fallout to HRMS MongoDB if not found.
+ * @param {string} username - Username
+ * @param {string} password - Plain password
+ * @returns {Promise<Object|null>} User object with portals mapped
+ */
+export const validateCredentialsForTransport = async (username, password) => {
+  // 1. Try Transport database first (Admin collection)
+  console.log(`[Auth-Transport] Attempting login via Transport database for: ${username}`);
+  let user = await validateTransportCredentials(username, password);
+  
+  if (user) {
+    console.log(`[Auth-Transport] User found in Transport database: ${user.id}`);
+    return {
+      ...user,
+      portals: ['transport-management'],
+      databaseSource: 'transport'
+    };
+  }
+
+  // 2. Fallback to HRMS database if not found in Transport
+  console.log(`[Auth-Transport] User not found in Transport, falling back to HRMS database for: ${username}`);
+  user = await validateHRMSCredentials(username, password);
+  
+  if (user) {
+    console.log(`[Auth-Transport] User found in HRMS database via fallback: ${user.id}`);
+    return {
+      ...user,
+      portals: ['transport-management', 'hrms'], // Grant both since they are valid HRMS users
+      databaseSource: 'hrms'
+    };
+  }
+
+  console.log(`[Auth-Transport] User not found in either Transport or HRMS for: ${username}`);
+  return null;
+};
+
+/**
  * Generate encrypted SSO token for portal access
  * @param {string} userId - User ID
  * @param {string} portalId - Target portal identifier
@@ -157,7 +195,7 @@ export const generatePortalToken = async (userId, portalId, role, databaseSource
     // Get portals based on database source
     if (databaseSource === 'rbac_users') {
       // RBAC users have access to multiple portals
-      userPortals = ['admissions-crm', 'hostel-automation', 'hrms', 'student-portal'];
+      userPortals = ['admissions-crm', 'hostel-automation', 'hrms', 'student-portal', 'transport-management', 'fee-management'];
     } else if (databaseSource === 'admissions_db') {
       // Admissions users have access to admissions-crm portal
       userPortals = ['admissions-crm'];
@@ -165,11 +203,14 @@ export const generatePortalToken = async (userId, portalId, role, databaseSource
       // Students have access to student-portal
       userPortals = ['student-portal'];
     } else if (databaseSource === 'hrms') {
-      // HRMS users (from HRMS Mongo) have access to hrms portal only
-      userPortals = ['hrms'];
+      // HRMS users (from HRMS Mongo) have access to hrms and transport portals
+      userPortals = ['hrms', 'transport-management'];
     } else if (databaseSource === 'hostel') {
       // Hostel users (from Hostel Mongo) have access to hostel-automation portal only
       userPortals = ['hostel-automation'];
+    } else if (databaseSource === 'transport') {
+      // Transport users (from Transport Mongo) have access to transport-management portal only
+      userPortals = ['transport-management'];
     }
     
     if (!userPortals.includes(portalId)) {
@@ -216,6 +257,17 @@ export const getCRMUserForVerify = async (userId, databaseSource = null) => {
           email: hostelUser.email || null,
           name: hostelUser.name || null,
           username: hostelUser.username || null
+        };
+      }
+      return null;
+    }
+    if (databaseSource === 'transport') {
+      const transportUser = await getTransportUserById(userId);
+      if (transportUser) {
+        return {
+          email: transportUser.email || null,
+          name: transportUser.name || null,
+          username: transportUser.username || null
         };
       }
       return null;
@@ -306,6 +358,7 @@ export default {
   validateCredentials,
   validateCredentialsForHRMS,
   validateCredentialsForHostel,
+  validateCredentialsForTransport,
   generatePortalToken,
   getCRMUserForVerify,
   hashPassword,

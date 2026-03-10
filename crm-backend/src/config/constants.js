@@ -13,7 +13,8 @@ export const PORTAL_IDS = {
   STUDENT_PORTAL: 'student-portal',
   HOSTEL_AUTOMATION: 'hostel-automation',
   HRMS: 'hrms',
-  PHARMACY: 'pharmacy'
+  PHARMACY: 'pharmacy',
+  TRANSPORT_MANAGEMENT: 'transport-management'
 };
 
 export const HTTP_STATUS = {
