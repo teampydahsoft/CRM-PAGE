@@ -226,7 +226,7 @@ export const validateCredentialsForFee = async (username, password) => {
  * @param {string} databaseSource - Which database the user came from ('rbac_users', 'student_credentials', or 'admissions_db')
  * @returns {string} Encrypted SSO token
  */
-export const generatePortalToken = async (userId, portalId, role, databaseSource = 'rbac_users') => {
+export const generatePortalToken = async (userId, portalId, role, databaseSource = 'rbac_users', username = null) => {
   try {
     let userPortals = [];
     
@@ -258,8 +258,8 @@ export const generatePortalToken = async (userId, portalId, role, databaseSource
       throw new Error('User does not have access to this portal');
     }
 
-    // Generate SSO JWT token (include databaseSource for HRMS verify-token lookup)
-    const ssoToken = generateSSOToken(userId, portalId, role, databaseSource);
+    // Generate SSO JWT token (include databaseSource and username for lookup/fallback)
+    const ssoToken = generateSSOToken(userId, portalId, role, databaseSource, username);
     
     // Encrypt the token
     const encryptedToken = encryptToken(ssoToken);

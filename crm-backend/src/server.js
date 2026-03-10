@@ -39,7 +39,9 @@ const productionOrigins = [
   'http://localhost:5173',               // Local CRM frontend
   'http://localhost:5175',               // Local Transport frontend
   'http://localhost:5174',               // Local Fee Management frontend
-  'http://localhost:5001'                // Local Fee Management backend
+  'http://localhost:5001',                // Local Fee Management backend
+  'https://pydah-fee-management.vercel.app', // Production Fee Management
+  'https://pydah-transport.vercel.app'       // Production Transport
 ];
 
 // Combine and remove duplicates
