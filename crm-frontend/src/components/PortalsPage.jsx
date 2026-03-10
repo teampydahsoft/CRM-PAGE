@@ -12,7 +12,7 @@ const portalDetails = [
         desc: 'A comprehensive lead management system designed to streamline the entire student enrollment funnel. From inquiry tracking to final registration, our CRM ensures no lead is left behind.',
         features: ['Automated Lead Scoring', 'Bulk Communication Tools', 'Document Verification Hub', 'Real-time Conversion Analytics'],
         color: '#0ea5e9',
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        image: 'https://i.pinimg.com/736x/4e/04/c9/4e04c9e0dd9b0a5360fe5c9a5784b862.jpg',
         url: 'https://pydah-admissions.vercel.app/auth/login',
         portalId: 'admissions-crm'
     },
@@ -22,7 +22,7 @@ const portalDetails = [
         desc: 'The central hub for student life. Access grades, schedules, course materials, and institutional announcements in one unified, mobile-responsive dashboard.',
         features: ['Personalized Course Timetable', 'Attendance & Grade Tracking', 'Digital Library Access', 'Campus Event Calendar'],
         color: '#f59e0b',
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/free-dashboard-templates.jpg',
+        image: 'https://i.pinimg.com/736x/5a/2e/2b/5a2e2b1a96243304c98937fb2b0444d5.jpg',
         url: 'https://pydahsdms.vercel.app/student/login',
         portalId: 'student-portal'
     },
@@ -32,7 +32,7 @@ const portalDetails = [
         desc: 'Streamline institutional finance with automated fee collection, scholarship management, and transparent financial reporting for parents and administrators.',
         features: ['Online Fee Payment', 'Automated Invoicing', 'Scholarship Tracking', 'Financial Defaulter Alerts'],
         color: '#8b5cf6',
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/free-dashboard-templates.jpg',
+        image: 'https://i.pinimg.com/736x/93/19/62/931962fb2d5f2bf75f94b526891c3f43.jpg',
         url: 'http://localhost:3000/fee-management/login',
         portalId: 'fee-management'
     },
@@ -42,7 +42,7 @@ const portalDetails = [
         desc: 'Optimize campus logistics with real-time fleet tracking, route management, and automated transport billing, ensuring student safety and operational efficiency.',
         features: ['Real-time GPS Tracking', 'Route Optimization', 'Transport Fee Billing', 'Driver & Vehicle Records'],
         color: '#14b8a6',
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        image: 'https://i.pinimg.com/736x/30/e0/52/30e0526855959f629396058ac463bc26.jpg',
         url: 'http://localhost:3000/transport/login',
         portalId: 'transport-management'
     },
@@ -52,7 +52,7 @@ const portalDetails = [
         desc: 'Transform residency management with smart room allocation, security protocols, and automated mess billing systems designed for modern campus living.',
         features: ['Smart Room Allocation', 'Security & Visitor Logs', 'Automated Mess Management', 'Student Safety Dashboard'],
         color: '#6366f1',
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        image: 'https://i.pinimg.com/736x/be/5b/59/be5b597fc3fce8fb5502c228cafa87f1.jpg',
         url: 'https://hms.pydahsoft.in/login',
         portalId: 'hostel-automation'
     },
@@ -62,7 +62,7 @@ const portalDetails = [
         desc: 'Empower your workforce with automated attendance, performance tracking, and a seamless payroll system that handles compliance and reporting automatically.',
         features: ['Automated Payroll Processing', 'Leave & Attendance Mapping', 'Performance Appraisal Hub', 'Staff Self-Service Portal'],
         color: '#ec4899',
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        image: 'https://i.pinimg.com/736x/7a/41/f4/7a41f43d70ae2960e8bead5fa240591f.jpg',
         url: 'https://li-hrms.vercel.app/login',
         portalId: 'hrms'
     }
@@ -148,8 +148,7 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
         offset: ["start end", "end start"]
     });
 
-    const yImg = useTransform(scrollYProgress, [0, 1], isMobile ? [40, -40] : [120, -120]);
-    const yTxt = useTransform(scrollYProgress, [0, 1], isMobile ? [-20, 20] : [-60, 60]);
+    // Simplified transforms - removed parallax Y movement
     const opacity = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
     const scale = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0.95, 1, 1, 0.95]);
 
@@ -172,7 +171,6 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
                 className="w-full lg:w-1/2 relative group block [perspective:2000px] cursor-pointer"
             >
                 <motion.div
-                    style={{ y: yImg }}
                     className="relative"
                 >
                     <div
@@ -180,19 +178,17 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
                         style={{ backgroundColor: portal.color }}
                     />
                     <motion.div
-                        whileHover={isMobile ? {} : {
-                            rotateX: idx % 2 === 0 ? 8 : -8,
-                            rotateY: idx % 2 === 0 ? -12 : 12,
-                            scale: 1.05,
-                            z: 50
+                        whileHover={{
+                            boxShadow: isMobile ? '0 30px 80px rgba(0,0,0,0.1)' : `0 40px 120px -10px ${portal.color}50`,
+                            borderColor: portal.color + '40'
                         }}
-                        transition={{ type: "spring", stiffness: 200, damping: 25 }}
-                        className="relative overflow-hidden rounded-[2rem] lg:rounded-[3.5rem] border border-white/60 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.1)] lg:shadow-[0_50px_120px_rgba(0,0,0,0.12)] transition-all duration-700"
+                        transition={{ duration: 0.5 }}
+                        className="relative overflow-hidden rounded-[2rem] lg:rounded-[3.5rem] border border-white/60 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.1)] lg:shadow-[0_50px_120px_rgba(0,0,0,0.12)] transition-all duration-700 aspect-[16/10] w-full"
                     >
                         <img
                             src={portal.image}
                             alt={portal.title}
-                            className="w-full h-auto object-cover transform group-hover:scale-105 lg:group-hover:scale-110 transition-transform duration-1000"
+                            className="w-full h-full object-cover transition-transform duration-1000"
                         />
                         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6 opacity-0 group-hover:opacity-100 transition-opacity">
                             <motion.div
@@ -220,7 +216,6 @@ const PortalSection = ({ portal, idx, isMobile, onPortalClick }) => {
 
             {/* Info Content - Parallax Text */}
             <motion.div
-                style={{ y: yTxt }}
                 className="w-full lg:w-1/2"
             >
                 <div className="mb-8 lg:mb-12">
