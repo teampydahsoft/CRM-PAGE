@@ -125,12 +125,13 @@ export const generateTokenForPortal = async (req, res, next) => {
       });
     }
 
-    // Get user role and database source (from token or fetch from DB)
+    // Get user role, database source, and username
     const userRole = req.user?.role || 'user';
     const databaseSource = req.user?.databaseSource || 'rbac_users';
+    const username = req.user?.username;
 
     // Generate encrypted SSO token
-    const encryptedToken = await generatePortalToken(userId, portalId, userRole, databaseSource);
+    const encryptedToken = await generatePortalToken(userId, portalId, userRole, databaseSource, username);
 
     res.status(HTTP_STATUS.OK).json({
       success: true,
@@ -341,7 +342,7 @@ export const verifyToken = async (req, res, next) => {
         data: {
           userId: String(decoded.userId),
           ...(crmUser?.email && { email: crmUser.email }),
-          ...(crmUser?.username && { username: crmUser.username }),
+          username: crmUser?.username || decoded.username,
           ...baseData
         }
       });
@@ -356,7 +357,7 @@ export const verifyToken = async (req, res, next) => {
         data: {
           userId: String(decoded.userId),
           ...(crmUser?.email && { email: crmUser.email }),
-          ...(crmUser?.username && { username: crmUser.username }),
+          username: crmUser?.username || decoded.username,
           ...(crmUser?.role && { role: crmUser.role }),
           ...baseData
         }
