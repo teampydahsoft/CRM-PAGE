@@ -38,13 +38,8 @@ const portalDetails = [
         desc: 'Streamline institutional finance with automated fee collection, scholarship management, and transparent financial reporting for parents and administrators.',
         features: ['Online Fee Payment', 'Automated Invoicing', 'Scholarship Tracking', 'Financial Defaulter Alerts'],
         color: '#00a6ffff',
-<<<<<<< HEAD
-        image: 'public/931962fb2d5f2bf75f94b526891c3f43.jpg',
-        url: 'http://localhost:5174/login',
-=======
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        image: '/931962fb2d5f2bf75f94b526891c3f43.jpg',
         url: 'https://pydah-fee-management.vercel.app/login',
->>>>>>> 9e91c0b4d79e7190d3f6977ce95368d005c07ac6
         portalId: 'fee-management'
     },
     {
@@ -55,7 +50,7 @@ const portalDetails = [
         desc: 'Optimize campus logistics with real-time fleet tracking, route management, and automated transport billing, ensuring student safety and operational efficiency.',
         features: ['Real-time GPS Tracking', 'Route Optimization', 'Transport Fee Billing', 'Driver & Vehicle Records'],
         color: '#0f73ffff',
-        image: 'public/Gemini_Generated_Image_xuaavlxuaavlxuaa.png',
+        image: '/Gemini_Generated_Image_xuaavlxuaavlxuaa.png',
         url: 'https://pydah-transport.vercel.app/login',
         portalId: 'transport-management'
     },
