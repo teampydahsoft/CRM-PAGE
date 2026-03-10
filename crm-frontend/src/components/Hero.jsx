@@ -8,10 +8,10 @@ const Hero = ({ onNavigate }) => {
             paddingBottom: 'clamp(2rem, 4vw, 3rem)',
             overflowX: 'hidden'
         }}>
-            <div className="section-container grid grid-cols-1 md:grid-cols-[1fr_1.4fr] items-center w-full" style={{
-                gap: 'clamp(2rem, 5vw, 6rem)',
-                paddingTop: 'clamp(2rem, 4vw, 3rem)',
-                paddingBottom: 'clamp(2rem, 4vw, 3rem)'
+            <div className="section-container grid grid-cols-1 md:grid-cols-[1fr_1.3fr] items-center w-full" style={{
+                gap: 'clamp(3rem, 6vw, 8rem)',
+                paddingTop: 'clamp(1rem, 3vw, 2.5rem)',
+                paddingBottom: 'clamp(1rem, 3vw, 2.5rem)'
             }}>
                 {/* Left Content */}
                 <motion.div
@@ -20,9 +20,9 @@ const Hero = ({ onNavigate }) => {
                     transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                     className="order-1 md:order-1"
                 >
-                    <h1 className="text-[clamp(2rem,6vw,4.5rem)] leading-[1.05] font-extrabold tracking-tight text-center md:text-left" style={{
+                    <h1 className="text-[clamp(1.75rem,5vw,3.5rem)] leading-[1.1] font-extrabold tracking-tight text-center md:text-left" style={{
                         color: 'var(--color-text-main)',
-                        marginBottom: 'clamp(1.5rem, 3.5vw, 2rem)'
+                        marginBottom: 'clamp(1rem, 2.5vw, 1.5rem)'
                     }}>
                         The Official <br />
                         <span className="bg-gradient-to-r bg-clip-text text-transparent animate-text-gradient" style={{ backgroundImage: 'linear-gradient(to right, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-primary) 100%)' }}>
@@ -30,9 +30,9 @@ const Hero = ({ onNavigate }) => {
                         </span> <br />
                         for Pydah Organization.
                     </h1>
-                    <p className="text-[clamp(1rem,2vw,1.125rem)] max-w-[500px] mx-auto md:mx-0 text-center md:text-left" style={{
+                    <p className="text-[clamp(1rem,1.8vw,1.05rem)] max-w-[500px] mx-auto md:mx-0 text-center md:text-left" style={{
                         color: 'var(--color-text-muted)',
-                        marginBottom: 'clamp(2rem, 4.5vw, 2.5rem)',
+                        marginBottom: 'clamp(1.5rem, 3.5vw, 2rem)',
                         lineHeight: '1.6'
                     }}>
                         Experience the smoothness of high-performance management.

@@ -210,7 +210,7 @@ const BrowserMock = () => {
 
             {/* Content Area */}
             <div
-                className="browser-content h-[550px] sm:h-[clamp(400px,50vw,500px)] relative cursor-pointer overflow-hidden"
+                className="browser-content h-[clamp(260px,65vw,400px)] sm:h-[clamp(400px,40vw,480px)] relative cursor-pointer overflow-hidden"
                 onClick={() => {
                     window.open(activeTab.redirectUrl, '_blank');
                 }}

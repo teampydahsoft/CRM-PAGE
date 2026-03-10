@@ -7,6 +7,7 @@ import { authAPI } from '../services/api';
 
 const portalDetails = [
     {
+        title: 'Admission Portal',
         titleMain: 'Admission',
         titleAccent: 'Portal',
         category: 'Enrollment Management',
@@ -18,6 +19,7 @@ const portalDetails = [
         portalId: 'admissions-crm'
     },
     {
+        title: 'Student Portal',
         titleMain: 'Student Academic',
         titleAccent: 'Portal',
         category: 'Learning & Lifestyle',
@@ -29,17 +31,19 @@ const portalDetails = [
         portalId: 'student-portal'
     },
     {
+        title: 'Fee Management',
         titleMain: 'Fee',
         titleAccent: 'Management',
         category: 'Financial Systems',
         desc: 'Streamline institutional finance with automated fee collection, scholarship management, and transparent financial reporting for parents and administrators.',
         features: ['Online Fee Payment', 'Automated Invoicing', 'Scholarship Tracking', 'Financial Defaulter Alerts'],
         color: '#00a6ffff',
-        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        image: 'public/931962fb2d5f2bf75f94b526891c3f43.jpg',
         url: 'http://localhost:5174/login',
         portalId: 'fee-management'
     },
     {
+        title: 'Transport Management',
         titleMain: 'Transport',
         titleAccent: 'Management',
         category: 'Logistics Hub',
@@ -51,6 +55,7 @@ const portalDetails = [
         portalId: 'transport-management'
     },
     {
+        title: 'Hostel Automation',
         titleMain: 'Hostel',
         titleAccent: 'Automation',
         category: 'Facility Management',
@@ -62,6 +67,7 @@ const portalDetails = [
         portalId: 'hostel-automation'
     },
     {
+        title: 'HRMS & Payroll',
         titleMain: 'HRMS &',
         titleAccent: 'Payroll',
         category: 'Staff Operations',
@@ -73,6 +79,7 @@ const portalDetails = [
         portalId: 'hrms'
     },
     {
+        title: 'Pharmacy Inventory',
         titleMain: 'Pharmacy',
         titleAccent: 'Inventory',
         category: 'Lab Management',

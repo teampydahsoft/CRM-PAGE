@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, User, ArrowRight, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../services/api';
+import BackgroundAnimations from './BackgroundAnimations';
 
 const Login = ({ portalInfo, onLoginSuccess, onBack }) => {
   const [formData, setFormData] = useState({
@@ -129,33 +130,15 @@ const Login = ({ portalInfo, onLoginSuccess, onBack }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white relative overflow-hidden flex flex-col" style={{
+    <div className="w-full min-h-screen bg-slate-50 relative overflow-hidden flex flex-col" style={{
       paddingTop: 'clamp(80px, 12vw, 100px)',
       paddingBottom: 'clamp(4rem, 10vw, 8rem)'
     }}>
-      {/* 3D Decorative Background Elements */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          animate={{
-            y: [0, -40, 0],
-            rotate: [0, 5, 0],
-            scale: [1, 1.1, 1]
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] rounded-full blur-[80px] lg:blur-[120px] opacity-[0.05]"
-          style={{ backgroundColor: portalInfo?.color || '#4f46e5' }}
-        />
-        <motion.div
-          animate={{
-            y: [0, 60, 0],
-            rotate: [0, -10, 0],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[40%] -right-[10%] w-[50%] h-[50%] rounded-full blur-[100px] lg:blur-[150px] opacity-[0.03]"
-          style={{ backgroundColor: portalInfo?.color || '#0ea5e9' }}
-        />
-      </div>
+      {/* Dynamic Background Animations */}
+      <BackgroundAnimations
+        portalId={portalInfo?.portalId}
+        color={portalInfo?.color || '#6366f1'}
+      />
 
       {/* Content wrapper for centering */}
       <div className="w-full flex-1 relative z-10 flex flex-col items-center justify-center px-6 sm:px-10 lg:px-12">
