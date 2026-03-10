@@ -27,6 +27,26 @@ const portalDetails = [
         portalId: 'student-portal'
     },
     {
+        title: 'Fee Management',
+        category: 'Financial Systems',
+        desc: 'Streamline institutional finance with automated fee collection, scholarship management, and transparent financial reporting for parents and administrators.',
+        features: ['Online Fee Payment', 'Automated Invoicing', 'Scholarship Tracking', 'Financial Defaulter Alerts'],
+        color: '#8b5cf6',
+        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/free-dashboard-templates.jpg',
+        url: 'http://localhost:3000/fee-management/login',
+        portalId: 'fee-management'
+    },
+    {
+        title: 'Transport Management',
+        category: 'Logistics Hub',
+        desc: 'Optimize campus logistics with real-time fleet tracking, route management, and automated transport billing, ensuring student safety and operational efficiency.',
+        features: ['Real-time GPS Tracking', 'Route Optimization', 'Transport Fee Billing', 'Driver & Vehicle Records'],
+        color: '#14b8a6',
+        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        url: 'http://localhost:3000/transport/login',
+        portalId: 'transport-management'
+    },
+    {
         title: 'Hostel Automation',
         category: 'Facility Management',
         desc: 'Transform residency management with smart room allocation, security protocols, and automated mess billing systems designed for modern campus living.',
