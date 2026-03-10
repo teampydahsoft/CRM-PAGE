@@ -3,14 +3,12 @@ import CloudIllustrations from './CloudIllustrations';
 
 const FeaturesSection = () => {
     return (
-        <section className="relative bg-gradient-to-b from-white to-slate-50" style={{
+        <section id="features" className="relative bg-gradient-to-b from-white to-slate-50" style={{
             paddingTop: 'clamp(2rem, 8vw, 6rem)',
             paddingBottom: 'clamp(2rem, 8vw, 6rem)',
             overflowX: 'hidden'
         }}>
             <div className="section-container">
-                {/* Header Text */}
-                {/* Header Text */}
                 {/* Header Text */}
                 <div className="text-center" style={{
                     marginBottom: 'clamp(1rem, 5vw, 4rem)'

@@ -12,9 +12,9 @@ const AboutUsSection = () => {
     const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
     return (
-        <section ref={containerRef} id="about" className="bg-white relative" style={{
-            paddingTop: 'clamp(4rem, 10vw, 10rem)',
-            paddingBottom: 'clamp(4rem, 10vw, 10rem)',
+        <section ref={containerRef} id="about" className="relative" style={{
+            paddingTop: 'clamp(3rem, 10vw, 8rem)',
+            paddingBottom: 'clamp(3rem, 10vw, 8rem)',
         }}>
             <div className="section-container">
                 <div className="text-center sticky z-[100] bg-white/95 backdrop-blur-md py-4" style={{

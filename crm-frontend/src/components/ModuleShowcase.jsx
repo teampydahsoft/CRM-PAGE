@@ -106,7 +106,7 @@ const ModuleShowcase = () => {
     };
 
     return (
-        <section className="relative overflow-hidden bg-white" style={{
+        <section id="portals" className="relative overflow-hidden bg-white" style={{
             paddingTop: 'clamp(4rem, 8vw, 8rem)',
             paddingBottom: 'clamp(4rem, 8vw, 8rem)'
         }}>
