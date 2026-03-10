@@ -14,7 +14,8 @@ export const PORTAL_IDS = {
   HOSTEL_AUTOMATION: 'hostel-automation',
   HRMS: 'hrms',
   PHARMACY: 'pharmacy',
-  TRANSPORT_MANAGEMENT: 'transport-management'
+  TRANSPORT_MANAGEMENT: 'transport-management',
+  FEE_MANAGEMENT: 'fee-management'
 };
 
 export const HTTP_STATUS = {

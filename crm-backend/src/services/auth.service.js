@@ -5,6 +5,7 @@ import { findStudentByUsername, findStudentById } from '../models/student.model.
 import { validateHRMSCredentials, getHRMSUserById } from './hrms.service.js';
 import { validateHostelCredentials, getHostelUserById } from './hostel.service.js';
 import { validateTransportCredentials, getTransportUserById } from './transport.service.js';
+import { validateFeeCredentials, getFeeUserById } from './fee.service.js';
 import { generateSSOToken } from './token.service.js';
 import { encryptToken } from './encryption.service.js';
 import { ERROR_MESSAGES } from '../config/constants.js';
@@ -181,6 +182,43 @@ export const validateCredentialsForTransport = async (username, password) => {
 };
 
 /**
+ * Validate credentials against Fee MongoDB, fallout to HRMS MongoDB if not found.
+ * @param {string} username - Username
+ * @param {string} password - Plain password
+ * @returns {Promise<Object|null>} User object with portals mapped
+ */
+export const validateCredentialsForFee = async (username, password) => {
+  // 1. Try Fee database first (User collection)
+  console.log(`[Auth-Fee] Attempting login via Fee database for: ${username}`);
+  let user = await validateFeeCredentials(username, password);
+  
+  if (user) {
+    console.log(`[Auth-Fee] User found in Fee database: ${user.id}`);
+    return {
+      ...user,
+      portals: ['fee-management'],
+      databaseSource: 'fee'
+    };
+  }
+
+  // 2. Fallback to HRMS database if not found in Fee
+  console.log(`[Auth-Fee] User not found in Fee, falling back to HRMS database for: ${username}`);
+  user = await validateHRMSCredentials(username, password);
+  
+  if (user) {
+    console.log(`[Auth-Fee] User found in HRMS database via fallback: ${user.id}`);
+    return {
+      ...user,
+      portals: ['fee-management', 'hrms'], // Grant both since they are valid HRMS users
+      databaseSource: 'hrms'
+    };
+  }
+
+  console.log(`[Auth-Fee] User not found in either Fee or HRMS for: ${username}`);
+  return null;
+};
+
+/**
  * Generate encrypted SSO token for portal access
  * @param {string} userId - User ID
  * @param {string} portalId - Target portal identifier
@@ -211,6 +249,9 @@ export const generatePortalToken = async (userId, portalId, role, databaseSource
     } else if (databaseSource === 'transport') {
       // Transport users (from Transport Mongo) have access to transport-management portal only
       userPortals = ['transport-management'];
+    } else if (databaseSource === 'fee') {
+      // Fee users (from Fee Mongo) have access to fee-management portal only
+      userPortals = ['fee-management'];
     }
     
     if (!userPortals.includes(portalId)) {
@@ -268,6 +309,18 @@ export const getCRMUserForVerify = async (userId, databaseSource = null) => {
           email: transportUser.email || null,
           name: transportUser.name || null,
           username: transportUser.username || null
+        };
+      }
+      return null;
+    }
+    if (databaseSource === 'fee') {
+      const feeUser = await getFeeUserById(userId);
+      if (feeUser) {
+        return {
+          email: feeUser.email || null,
+          name: feeUser.name || null,
+          username: feeUser.username || null,
+          role: feeUser.role || null
         };
       }
       return null;
@@ -359,6 +412,7 @@ export default {
   validateCredentialsForHRMS,
   validateCredentialsForHostel,
   validateCredentialsForTransport,
+  validateCredentialsForFee,
   generatePortalToken,
   getCRMUserForVerify,
   hashPassword,

@@ -35,8 +35,8 @@ const portalDetails = [
         desc: 'Streamline institutional finance with automated fee collection, scholarship management, and transparent financial reporting for parents and administrators.',
         features: ['Online Fee Payment', 'Automated Invoicing', 'Scholarship Tracking', 'Financial Defaulter Alerts'],
         color: '#00a6ffff',
-        image: 'https://i.pinimg.com/736x/93/19/62/931962fb2d5f2bf75f94b526891c3f43.jpg',
-        url: 'http://localhost:3000/fee-management/login',
+        image: 'https://colorlib.com/wp/wp-content/uploads/sites/2/sb-admin-2-free-dashboard-template-1.jpg',
+        url: 'http://localhost:5174/login',
         portalId: 'fee-management'
     },
     {
@@ -119,7 +119,7 @@ const Typewriter = ({ texts, speed = 100, delay = 2000, mainColor = "inherit", a
                 {currentText}
                 <motion.span
                     animate={{ opacity: [1, 0] }}
-                    transition={{ duration: 0.8, repeat: Infinity, ease: "steps(2)" }}
+                    transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
                     className="inline-block w-[2px] h-[0.8em] bg-current ml-1 mb-[-0.1em]"
                 />
             </span>
@@ -135,7 +135,7 @@ const Typewriter = ({ texts, speed = 100, delay = 2000, mainColor = "inherit", a
             <span style={{ color: accentColor === "auto" ? item.color : accentColor }}>{accentPart}</span>
             <motion.span
                 animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.8, repeat: Infinity, ease: "steps(2)" }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
                 className="inline-block w-[3px] h-[0.8em] bg-indigo-600 ml-1 mb-[-0.1em]"
             />
         </span>

@@ -3,6 +3,7 @@ import {
   validateCredentialsForHRMS, 
   validateCredentialsForHostel, 
   validateCredentialsForTransport,
+  validateCredentialsForFee,
   generatePortalToken, 
   getCRMUserForVerify 
 } from '../services/auth.service.js';
@@ -42,6 +43,8 @@ export const login = async (req, res, next) => {
       user = await validateCredentialsForHostel(username, password);
     } else if (portalId === PORTAL_IDS.TRANSPORT_MANAGEMENT) {
       user = await validateCredentialsForTransport(username, password);
+    } else if (portalId === PORTAL_IDS.FEE_MANAGEMENT) {
+      user = await validateCredentialsForFee(username, password);
     } else {
       user = await validateCredentials(username, password, role);
     }
@@ -339,6 +342,22 @@ export const verifyToken = async (req, res, next) => {
           userId: String(decoded.userId),
           ...(crmUser?.email && { email: crmUser.email }),
           ...(crmUser?.username && { username: crmUser.username }),
+          ...baseData
+        }
+      });
+    }
+
+    // For Fee portal: return userId (and username/email) that Fee can use
+    if (decoded.portalId === PORTAL_IDS.FEE_MANAGEMENT) {
+      const crmUser = await getCRMUserForVerify(decoded.userId, decoded.databaseSource);
+      return res.status(HTTP_STATUS.OK).json({
+        success: true,
+        valid: true,
+        data: {
+          userId: String(decoded.userId),
+          ...(crmUser?.email && { email: crmUser.email }),
+          ...(crmUser?.username && { username: crmUser.username }),
+          ...(crmUser?.role && { role: crmUser.role }),
           ...baseData
         }
       });

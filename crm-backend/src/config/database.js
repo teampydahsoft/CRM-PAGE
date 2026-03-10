@@ -19,6 +19,8 @@ let hostelMongoClient = null;
 let hostelMongoDb = null;
 let transportMongoClient = null;
 let transportMongoDb = null;
+let feeMongoClient = null;
+let feeMongoDb = null;
 
 /**
  * Create MySQL connection pool for student database
@@ -139,7 +141,12 @@ export const connectDatabase = async () => {
       await connectTransportMongo();
     }
 
-    return { studentPool, admissionsPool, hrmsMongoDb, hostelMongoDb, transportMongoDb };
+    // Connect to Fee MongoDB if configured
+    if (process.env.FEE_MONGO_URI || process.env.FEE_MONGO_URL) {
+      await connectFeeMongo();
+    }
+
+    return { studentPool, admissionsPool, hrmsMongoDb, hostelMongoDb, transportMongoDb, feeMongoDb };
   } catch (error) {
     console.error('❌ Database connection error:', error);
     throw error;
@@ -178,6 +185,12 @@ export const closeDatabase = async () => {
       transportMongoClient = null;
       transportMongoDb = null;
       console.log('✅ Transport MongoDB connection closed');
+    }
+    if (feeMongoClient) {
+      await feeMongoClient.close();
+      feeMongoClient = null;
+      feeMongoDb = null;
+      console.log('✅ Fee MongoDB connection closed');
     }
   } catch (error) {
     console.error('❌ Error closing database connection:', error);
@@ -297,6 +310,43 @@ export const getTransportDb = async () => {
   return connectTransportMongo();
 };
 
+/**
+ * Connect to Fee MongoDB (optional; when FEE_MONGO_URI is set)
+ * @returns {Promise<import('mongodb').Db|null>} Fee db instance or null
+ */
+export const connectFeeMongo = async () => {
+  const uri = process.env.FEE_MONGO_URI || process.env.FEE_MONGO_URL;
+  if (!uri) {
+    return null;
+  }
+  if (feeMongoClient) {
+    return feeMongoDb;
+  }
+  try {
+    feeMongoClient = new MongoClient(uri);
+    await feeMongoClient.connect();
+    feeMongoDb = feeMongoClient.db();
+    console.log('✅ Fee MongoDB connection established');
+    return feeMongoDb;
+  } catch (error) {
+    console.error('❌ Fee MongoDB connection error:', error.message);
+    feeMongoClient = null;
+    feeMongoDb = null;
+    return null;
+  }
+};
+
+/**
+ * Get Fee MongoDB db instance (lazy connect if URI is set)
+ * @returns {Promise<import('mongodb').Db|null>} Fee db or null if not configured
+ */
+export const getFeeDb = async () => {
+  if (feeMongoDb) {
+    return feeMongoDb;
+  }
+  return connectFeeMongo();
+};
+
 export default {
   createPool,
   createStudentPool,
@@ -309,6 +359,8 @@ export default {
   getHostelDb,
   connectTransportMongo,
   getTransportDb,
+  connectFeeMongo,
+  getFeeDb,
   getPool,
   getStudentPool,
   getAdmissionsPool,
