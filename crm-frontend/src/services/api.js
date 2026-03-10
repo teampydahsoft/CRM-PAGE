@@ -140,7 +140,7 @@ export const PORTAL_IDS = {
   'https://li-hrms.vercel.app': 'hrms', // HRMS portal
   'http://localhost:3000': 'hostel-automation', // Hostel software (local dev; HRMS local may use another port)
   'http://localhost:3000/fee-management/login': 'fee-management',
-  'http://localhost:3000/transport/login': 'transport-management',
+  'http://localhost:5175/login': 'transport-management',
   'https://pydah-pharmacy-labs.vercel.app': 'pharmacy',
 };
 

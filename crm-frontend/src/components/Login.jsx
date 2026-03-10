@@ -64,7 +64,9 @@ const Login = ({ portalInfo, onLoginSuccess, onBack }) => {
     try {
       // When HRMS portal: backend validates against HRMS MongoDB only.
       // When Hostel portal: backend validates against Hostel MongoDB (admins + users) only.
-      const portalId = (portalInfo?.portalId === 'hrms' || portalInfo?.portalId === 'hostel-automation')
+      const portalId = (portalInfo?.portalId === 'hrms' ||
+        portalInfo?.portalId === 'hostel-automation' ||
+        portalInfo?.portalId === 'transport-management')
         ? portalInfo.portalId
         : null;
       const response = await authAPI.login(formData.username, formData.password, null, portalId);
