@@ -17,7 +17,7 @@ const modules = [
     },
     {
         id: 'admit',
-        title: 'Admissions',
+        title: 'Admission Portal',
         desc: 'Streamline enrollment and lead pipeline.',
         icon: Users,
         color: '#0ea5e9',

@@ -1,32 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Users, Home, ClipboardCheck, UserCircle, CreditCard, Box, Layout } from 'lucide-react';
+import { Menu, X, ChevronDown, Users, Home, ClipboardCheck, UserCircle, CreditCard, Box, Layout, Bus, ReceiptText } from 'lucide-react';
 import { useState, useRef } from 'react';
 
 const solutions = [
 
   {
-    title: 'Admissions CRM',
+    title: 'Admission Portal',
     desc: 'Next-generation enrollment and lead management.',
     url: 'https://admissions.pydahsoft.in',
     icon: Users,
     color: '#0ea5e9',
     portalId: 'admissions-crm'
-  },
-  {
-    title: 'Hostel Automation',
-    desc: 'Smart and secure student residency management.',
-    url: 'https://hms.pydahsoft.in',
-    icon: Home,
-    color: '#6366f1',
-    portalId: 'hostel-automation'
-  },
-  {
-    title: 'Pharmacy Inventory',
-    desc: 'Specially crafted stock management for college labs.',
-    url: 'https://pydah-pharmacy-labs.vercel.app',
-    icon: Box,
-    color: '#10b981',
-    portalId: 'pharmacy'
   },
   {
     title: 'Student Portal',
@@ -37,28 +21,44 @@ const solutions = [
     portalId: 'student-portal'
   },
   {
-    title: 'Employee Portal',
-    desc: 'Secure login for staff and faculty members.',
-    url: 'https://li-hrms.vercel.app/login',
-    icon: ClipboardCheck,
-    color: '#ec4899',
-    portalId: 'hrms'
+    title: 'Fee Management',
+    desc: 'Streamline institutional finance and fee collection.',
+    url: 'https://fee.pydahsoft.in',
+    icon: ReceiptText,
+    color: '#00a6ffff',
+    portalId: 'fee-management'
   },
   {
-    title: 'HR & Payroll',
+    title: 'Transport Management',
+    desc: 'Optimize campus logistics and fleet tracking.',
+    url: 'https://transport.pydahsoft.in',
+    icon: Bus,
+    color: '#0f73ffff',
+    portalId: 'transport-management'
+  },
+  {
+    title: 'Hostel Automation',
+    desc: 'Smart and secure student residency management.',
+    url: 'https://hms.pydahsoft.in',
+    icon: Home,
+    color: '#6366f1',
+    portalId: 'hostel-automation'
+  },
+  {
+    title: 'HRMS & Payroll',
     desc: 'Comprehensive HR management for institutions.',
     url: 'https://li-hrms.vercel.app',
     icon: CreditCard,
-    color: '#ef4444',
+    color: '#5372ffff',
     portalId: 'hrms'
   },
   {
-    title: 'Administration',
-    desc: 'Centralized control system for campus admins.',
-    url: 'https://pydahsdms.vercel.app',
-    icon: Layout,
-    color: '#64748b',
-    portalId: 'student-portal'
+    title: 'Pharmacy Inventory',
+    desc: 'Specially crafted stock management for college labs.',
+    url: 'https://pydah-pharmacy-labs.vercel.app',
+    icon: Box,
+    color: '#10b981',
+    portalId: 'pharmacy'
   }
 ];
 

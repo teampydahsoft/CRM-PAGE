@@ -16,7 +16,7 @@ const EcosystemDiagram = () => {
         { id: 'engagement', label: 'Campus Engagement', icon: Activity, emoji: '🤝', color: '#64748b', x: -280, y: -280 }, // Top Left
 
         // Right Side Nodes (Mirrored)
-        { id: 'admissions', label: 'Admissions', icon: Users, emoji: '📝', color: '#0ea5e9', x: 280, y: -280 }, // Top Right
+        { id: 'admissions', label: 'Admission Portal', icon: Users, emoji: '📝', color: '#0ea5e9', x: 280, y: -280 }, // Top Right
         { id: 'academics', label: 'Academics', icon: BookOpen, emoji: '📚', color: '#f59e0b', x: 350, y: -120 },
         { id: 'finance', label: 'Fee Payments', icon: CreditCard, emoji: '💳', color: '#10b981', x: 350, y: 120 },
         { id: 'exams', label: 'Examinations', icon: ClipboardCheck, emoji: '✍️', color: '#f97316', x: 280, y: 280 } // Bottom Right
