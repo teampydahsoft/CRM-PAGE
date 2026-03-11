@@ -23,7 +23,7 @@ const solutions = [
   {
     title: 'Fee Management',
     desc: 'Streamline institutional finance and fee collection.',
-    url: 'https://pydah-fee-management.vercel.app',
+    url: 'https://pydah-fee-management.vercel.app/login',
     icon: ReceiptText,
     color: '#00a6ffff',
     portalId: 'fee-management'
@@ -31,7 +31,7 @@ const solutions = [
   {
     title: 'Transport Management',
     desc: 'Optimize campus logistics and fleet tracking.',
-    url: 'https://pydah-transport.vercel.app',
+    url: 'https://pydah-transport.vercel.app/login',
     icon: Bus,
     color: '#0f73ffff',
     portalId: 'transport-management'
