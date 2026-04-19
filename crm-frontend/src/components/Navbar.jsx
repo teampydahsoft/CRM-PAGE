@@ -7,7 +7,7 @@ const solutions = [
   {
     title: 'Admission Portal',
     desc: 'Next-generation enrollment and lead management.',
-    url: 'https://admissions.pydahsoft.in',
+    url: 'https://admissions.pydah.edu.in',
     icon: Users,
     color: '#0ea5e9',
     portalId: 'admissions-crm'
@@ -47,7 +47,7 @@ const solutions = [
   {
     title: 'HRMS & Payroll',
     desc: 'Comprehensive HR management for institutions.',
-    url: 'https://li-hrms.vercel.app',
+    url: 'https://hrms.pydah.edu.in',
     icon: CreditCard,
     color: '#5372ffff',
     portalId: 'hrms'

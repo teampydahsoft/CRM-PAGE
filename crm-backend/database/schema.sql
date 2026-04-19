@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS user_portals (
 
 -- Insert default portals
 INSERT INTO portals (portal_id, portal_name, portal_url, description, is_active) VALUES
-('admissions-crm', 'Admissions CRM', 'https://admissions.pydahsoft.in', 'Student enrollment and lead management system', 1),
+('admissions-crm', 'Admissions CRM', 'https://admissions.pydah.edu.in', 'Student enrollment and lead management system', 1),
 ('student-portal', 'Student Academic Portal', 'https://pydahsdms.vercel.app', 'Student academic and lifestyle portal', 1),
 ('hostel-automation', 'Hostel Automation', 'https://hms.pydahsoft.in', 'Hostel and facility management system', 1),
 ('hrms', 'HRMS & Payroll', 'https://hrms.pydahsoft.in', 'Human resources and payroll management', 1),

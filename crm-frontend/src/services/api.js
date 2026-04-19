@@ -133,11 +133,11 @@ export const authAPI = {
  * Maps portal URLs to backend portal IDs
  */
 export const PORTAL_IDS = {
-  'https://admissions.pydahsoft.in': 'admissions-crm',
+  'https://admissions.pydah.edu.in': 'admissions-crm',
   'https://pydahsdms.vercel.app': 'student-portal',
   'https://hms.pydahsoft.in': 'hostel-automation',
   'https://hrms.pydahsoft.in': 'hrms',
-  'https://li-hrms.vercel.app': 'hrms', // HRMS portal
+  'https://hrms.pydah.edu.in': 'hrms', // HRMS portal
   'http://localhost:3000': 'hostel-automation', // Hostel software (local dev; HRMS local may use another port)
   'https://pydah-fee-management.vercel.app': 'fee-management',
   'https://pydah-transport.vercel.app': 'transport-management',

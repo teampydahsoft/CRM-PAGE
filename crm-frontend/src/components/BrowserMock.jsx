@@ -25,7 +25,7 @@ const tabs = [
         id: 'hrms',
         name: 'Payroll & HRMS',
         displayUrl: 'li-hrms.vercel.app',
-        redirectUrl: 'https://li-hrms.vercel.app',
+        redirectUrl: 'https://hrms.pydah.edu.in',
         icon: CreditCard,
         color: '#10b981',
         bgColor: '#F0FDF4'
