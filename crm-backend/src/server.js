@@ -31,15 +31,14 @@ if (process.env.CORS_ORIGIN) {
 const productionOrigins = [
   'https://crm.pydah.edu.in',           // Production CRM frontend
   'https://pydahsdms.vercel.app',        // Production student portal
-  'https://pydah-admissions.vercel.app', // Development portal application
-  'https://li-hrms.vercel.app',          // HRMS portal (SSO redirect target; may call CRM backend from browser)
+  'https://admissions.pydah.edu.in', // Development portal application
+  'https://hrms.pydah.edu.in',          // HRMS portal (SSO redirect target; may call CRM backend from browser)
   'https://hms.pydahsoft.in',            // Hostel management system (HMS) production
   'http://localhost:3000',               // Local hostel software (and/or student/HRMS portal in dev)
   'http://localhost:5000',               // Local HRMS backend
   'http://localhost:5173',               // Local CRM frontend
   'http://localhost:5175',               // Local Transport frontend
-  'http://localhost:5174',               // Local Fee Management frontend
-  'http://localhost:5001',                // Local Fee Management backend
+  'http://localhost:5174',               // Local Fee Management frontend               // Local Fee Management backend
   'https://pydah-fee-management.vercel.app', // Production Fee Management
   'https://pydah-transport.vercel.app'       // Production Transport
 ];
