@@ -15,7 +15,7 @@ const portalDetails = [
         features: ['Automated Lead Scoring', 'Bulk Communication Tools', 'Document Verification Hub', 'Real-time Conversion Analytics'],
         color: '#0ea5e9',
         image: 'https://i.pinimg.com/736x/4e/04/c9/4e04c9e0dd9b0a5360fe5c9a5784b862.jpg',
-        url: 'https://pydah-admissions.vercel.app/auth/login',
+        url: 'https://admissions.pydah.edu.in/auth/login',
         portalId: 'admissions-crm'
     },
     {
@@ -75,7 +75,7 @@ const portalDetails = [
         features: ['Automated Payroll Processing', 'Leave & Attendance Mapping', 'Performance Appraisal Hub', 'Staff Self-Service Portal'],
         color: '#5372ffff',
         image: 'https://i.pinimg.com/736x/7a/41/f4/7a41f43d70ae2960e8bead5fa240591f.jpg',
-        url: 'https://li-hrms.vercel.app/login',
+        url: 'https://hrms.pydah.edu.in/login',
         portalId: 'hrms'
     },
     {
