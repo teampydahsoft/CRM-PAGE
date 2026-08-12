@@ -92,6 +92,14 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Add this route in the CRM Backend server code to redirect old Transport QR scans
+app.get('/verify-transport/:id', (req, res) => {
+    const transportFrontendUrl = 'https://transport.pydah.edu.in';
+    const redirectUrl = `${transportFrontendUrl}/verify-transport/${encodeURIComponent(req.params.id)}`;
+    res.redirect(301, redirectUrl);
+});
+
+
 // Test endpoint for verify-token route
 app.get('/auth/verify-token/test', (req, res) => {
   res.status(200).json({
